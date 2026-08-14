@@ -1,5 +1,6 @@
 # 🫁 PulmoScan-AI: End-to-End Chest Disease Classification MLOps Platform
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-brightgreen?style=for-the-badge&logo=render&logoColor=white)](https://pulmoscanai-oizh.onrender.com)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.12-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)](https://mlflow.org/)
@@ -10,10 +11,14 @@
 
 Developed by **[Jay Negi](https://github.com/Jay2849)**
 
+[![Live Deployment](https://img.shields.io/badge/%F0%9F%8D%90%20Live%20App-pulmoscanai--oizh.onrender.com-success?style=flat-square)](https://pulmoscanai-oizh.onrender.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/jaynegi2819/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=flat-square&logo=github)](https://github.com/Jay2849)
 
 ---
+
+> 🚀 **Live Web App**: [https://pulmoscanai-oizh.onrender.com](https://pulmoscanai-oizh.onrender.com)
+
 
 ## 📌 Project Overview
 
