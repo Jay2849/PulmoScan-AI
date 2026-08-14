@@ -1,6 +1,5 @@
 import os
 import traceback
-from Respire.Utils import decodeImage
 from flask_cors import CORS, cross_origin
 from flask import Flask, request, jsonify, render_template
 from Respire.Pipeline.Prediction_Pipeline import PredictionPipeline
@@ -19,6 +18,10 @@ class ClientApp:
         self.classifier = PredictionPipeline(self.filename)
 
 
+# Global instance ensures availability under WSGI/Gunicorn and direct execution
+clApp = ClientApp()
+
+
 @app.route("/", methods=['GET'])
 @cross_origin()
 def home():
@@ -30,8 +33,7 @@ def predictRoute():
     try:
         data = request.get_json(force=True)
         image = data.get('image', '')
-        decodeImage(image, clApp.filename)
-        result = clApp.classifier.predict()
+        result = clApp.classifier.predict(image_b64=image)
         return jsonify(result)
     except Exception as e:
         print("Prediction route exception:", str(e))
@@ -39,6 +41,5 @@ def predictRoute():
         return jsonify([{"image": f"Prediction Error: {str(e)}"}])
 
 if __name__ == "__main__":
-    clApp = ClientApp()
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)

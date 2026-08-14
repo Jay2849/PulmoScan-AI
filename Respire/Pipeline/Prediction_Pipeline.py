@@ -1,53 +1,65 @@
 import os
+import io
+import base64
 import numpy as np
+from PIL import Image
 # pyrefly: ignore [missing-import]
 from tensorflow.keras.models import load_model
-# pyrefly: ignore [missing-import]
-from tensorflow.keras.preprocessing import image
-# pyrefly: ignore [missing-import]
-from Respire.Pipeline.Training_Pipeline.Data_Ingestion import DataIngestionTrainingPipeline
-# pyrefly: ignore [missing-import]
-from Respire.Pipeline.Training_Pipeline.Base_Model import PrepareBaseModelTrainingPipeline
-# pyrefly: ignore [missing-import]
-from Respire.Pipeline.Training_Pipeline.Model_Trainer import ModelTrainingPipeline
 
 
 class PredictionPipeline:
-    def __init__(self, filename):
+    def __init__(self, filename="inputImage.jpg"):
         self.filename = filename
         self.model = None
         self.model_path = os.path.join("Artifacts", "Model_Training", "Trained_Model.h5")
+        self._load_and_warmup_model()
+
+    def _load_and_warmup_model(self):
         if os.path.exists(self.model_path):
             try:
+                print(f"Loading model from {self.model_path}...")
                 self.model = load_model(self.model_path, compile=False)
+                # Warmup: Run dummy inference once to pre-compile execution graph in memory
+                dummy = np.zeros((1, 224, 224, 3), dtype=np.float32)
+                _ = self.model(dummy, training=False)
+                print("Model loaded & warmed up successfully!")
             except Exception as e:
-                print("Initial model load warning:", e)
-    
-    def predict(self):
-        if self.model is None or not os.path.exists(self.model_path):
-            print("Model file not found. Initializing pipeline to train model...")
-            try:
-                ingestion = DataIngestionTrainingPipeline()
-                ingestion.main()
-                base_model = PrepareBaseModelTrainingPipeline()
-                base_model.main()
-                trainer = ModelTrainingPipeline()
-                trainer.main()
-            except Exception as e:
-                print("Model generation error:", e)
-            self.model = load_model(self.model_path, compile=False)
+                print("Initial model load warning:", str(e))
 
-        imagename = self.filename
-        test_image = image.load_img(imagename, target_size=(224, 224))
-        test_image = image.img_to_array(test_image)
-        test_image = test_image / 255.0
-        test_image = np.expand_dims(test_image, axis=0)
-        result = np.argmax(self.model.predict(test_image), axis=1)
-        print("Prediction result index:", result)
+    def predict(self, image_b64=None):
+        if self.model is None:
+            if os.path.exists(self.model_path):
+                self._load_and_warmup_model()
+            else:
+                return [{"image": "Error: Model file not found on server."}]
 
-        if result[0] == 1:
-            prediction = 'Normal'
+        try:
+            # Process image in-memory if base64 provided, else fallback to file
+            if image_b64 and len(image_b64) > 50:
+                if "," in image_b64:
+                    image_b64 = image_b64.split(",")[1]
+                img_bytes = base64.b64decode(image_b64)
+                img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+            elif os.path.exists(self.filename):
+                img = Image.open(self.filename).convert("RGB")
+            else:
+                return [{"image": "Error: Invalid image source."}]
+
+            img = img.resize((224, 224))
+            test_image = np.array(img, dtype=np.float32) / 255.0
+            test_image = np.expand_dims(test_image, axis=0)
+
+            # Direct tensor call is 3x to 5x faster than model.predict() in Flask
+            preds = self.model(test_image, training=False)
+            result = np.argmax(preds.numpy(), axis=1)
+            print("Prediction result index:", result)
+
+            if result[0] == 1:
+                prediction = 'Normal'
+            else:
+                prediction = 'Adenocarcinoma Cancer'
+
             return [{"image": prediction}]
-        else:
-            prediction = 'Adenocarcinoma Cancer'
-            return [{"image": prediction}]
+        except Exception as e:
+            print("Prediction error:", str(e))
+            return [{"image": f"Prediction Error: {str(e)}"}]
