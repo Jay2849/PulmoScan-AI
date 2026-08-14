@@ -555,20 +555,34 @@
     <script>
         var base_data = "";
 
+        function processFile(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 224;
+                    canvas.height = 224;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, 224, 224);
+                    var resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    base_data = resizedDataUrl.replace(/^data:image.+;base64,/, '');
+                    
+                    $('#photo').attr('src', e.target.result);
+                    $('#upload-area').hide();
+                    $('#preview-area').css('display', 'flex');
+                    $('#results-empty').show();
+                    $('#results-box').hide();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         $(document).ready(function() {
             $('#fileinput').change(function() {
                 if (this.files && this.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        var url = e.target.result;
-                        base_data = url.replace(/^data:image.+;base64,/, '');
-                        $('#photo').attr('src', url);
-                        $('#upload-area').hide();
-                        $('#preview-area').css('display', 'flex');
-                        $('#results-empty').show();
-                        $('#results-box').hide();
-                    };
-                    reader.readAsDataURL(this.files[0]);
+                    processFile(this.files[0]);
                 }
             });
 
@@ -591,6 +605,7 @@
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ image: base_data }),
+                    timeout: 45000,
                     success: function(res) {
                         $('#loading-box').hide();
                         $('#results-empty').hide();
@@ -616,9 +631,9 @@
                             alertDesc.text('No signs of Adenocarcinoma cancer were detected in the CT scan image.');
                         }
                     },
-                    error: function(err) {
+                    error: function(xhr, status, err) {
                         $('#loading-box').hide();
-                        alert('Error connecting to PulmoScan-AI server.');
+                        alert('Error connecting to PulmoScan-AI server (' + (err || status) + '). If the server was idle, please wait 30 seconds for it to wake up and try clicking Analyze again.');
                     }
                 });
             });

@@ -1,5 +1,6 @@
 import os
 import io
+import gc
 import base64
 import numpy as np
 from PIL import Image
@@ -22,6 +23,8 @@ class PredictionPipeline:
                 # Warmup: Run dummy inference once to pre-compile execution graph in memory
                 dummy = np.zeros((1, 224, 224, 3), dtype=np.float32)
                 _ = self.model(dummy, training=False)
+                del dummy
+                gc.collect()
                 print("Model loaded & warmed up successfully!")
             except Exception as e:
                 print("Initial model load warning:", str(e))
@@ -59,7 +62,12 @@ class PredictionPipeline:
             else:
                 prediction = 'Adenocarcinoma Cancer'
 
+            # Clean up intermediate array objects to keep RAM low
+            del test_image, preds, img
+            gc.collect()
+
             return [{"image": prediction}]
         except Exception as e:
             print("Prediction error:", str(e))
+            gc.collect()
             return [{"image": f"Prediction Error: {str(e)}"}]
