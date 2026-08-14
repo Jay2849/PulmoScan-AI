@@ -5,5 +5,11 @@
     ],
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}"
+    ],
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "Respire",
+            "depth": 5
+        }
     ]
 }
