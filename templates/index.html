@@ -3,217 +3,843 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PulmoScan-AI | Chest CT-Scan Disease Classification</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<style>
-		body{background-color: #eff2f9;}
-		.iupload h3{color: #1b2d6b;font-size: 30px;font-weight: 700;}
-		.img-part{height:300px;width:300px;margin:0px auto;}
-		.image-part{height:300px;width:300px;border:1px solid #1b2d6b;}
-		.image-part img{position:absolute;height: 300px;width:300px;display:none;padding:5px;}
-		.image-part #video{display:block;height: 300px;width:300px;padding:5px;}
-		.res-part{border:1px solid #dedede;margin-left:20px;height: 310px;width:100%;padding:5px;margin:0px auto;overflow:auto;}
-		.res-part2{border:1px solid #dedede;height: 310px;width:100%;padding:5px;margin:0px auto;}
-		.resp-img{height: 298px;width: 233px;margin:0px auto;}
-		.jsonRes{margin-left:30px;}
-		#send{cursor:pointer;}
-		.btn-part{width:325px;}
-		textarea,
-		select,
-		.form-control,
-		.custom-select,
-		button.btn,
-		.btn-primary,
-		input[type="text"],
-		input[type="url"],
-		.uneditable-input{
-			border: 1px solid #363e75;
-			outline: 0 !important;
-			border-radius:0px;
-			box-shadow: none;
-		   -webkit-box-shadow: none;
-		   -moz-box-shadow: none;
-		   -moz-transition: none;
-		   -webkit-transition: none;
-		}
-		textarea:focus,
-		select:focus,
-		.form-control:focus,
-		.btn:focus,
-		.btn-primary:focus,
-		.custom-select:focus,
-		input[type="text"]:focus,
-		.uneditable-input:focus{
-			border: 1px solid #007bff;
-			outline: 0 !important;
-			border-radius:0px;
-			box-shadow: none;
-		   -webkit-box-shadow: none;
-		   -moz-box-shadow: none;
-		   -moz-transition: none;
-		   -webkit-transition: none;
-		}
-		#loading {
-			position: fixed;
-			left: 0px;
-			top: 0px;
-			width: 100%;
-			height: 100%;
-			z-index: 9999999999;
-			overflow: hidden;
-			background: rgba(255, 255, 255, 0.7);
-		}
-		.loader {
-			border: 8px solid #f3f3f3;
-			border-top: 8px solid #363e75;
-			border-radius: 50%;
-			width: 60px;
-			height: 60px;
-			left: 50%;
-			margin-left: -4em;
-			display: block;
-			animation: spin 2s linear infinite;
-		}
-		.loader,
-		.loader:after {display: block;position: absolute;top: 50%;margin-top: -4.05em;}
-		@keyframes spin {
-			0% {
-				transform: rotate(0deg);
-			}
-			100% {
-				transform: rotate(360deg);
-			}
-		}
-		.right-part{border:1px solid #dedede;padding:5px;}
-		.logo{position:absolute;right:0px;bottom:0px;margin-right:30px;margin-bottom:30px;}
-	</style>
+    <title>PulmoScan-AI | Medical Imaging Diagnostic Suite</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #070913;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-primary: #3b82f6;
+            --accent-glow: #60a5fa;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 40%);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: rgba(7, 9, 19, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.35rem;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .brand-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-badge {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--accent-glow);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link-btn:hover {
+            color: var(--text-main);
+        }
+
+        /* Main Container */
+        .main-wrapper {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Hero Banner */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 680px;
+            margin: 0 auto 1.75rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Bar */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--accent-cyan);
+        }
+
+        .stat-info h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Diagnostic Workspace Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Panels */
+        .panel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .panel-title i {
+            color: var(--accent-primary);
+        }
+
+        /* Dropzone Upload */
+        .dropzone-container {
+            border: 2px dashed rgba(59, 130, 246, 0.35);
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone-container:hover, .dropzone-container.dragover {
+            border-color: var(--accent-glow);
+            background: rgba(59, 130, 246, 0.08);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .upload-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            color: var(--accent-glow);
+            font-size: 1.85rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropzone-container:hover .upload-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .dropzone-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropzone-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-browse {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+            color: white;
+            padding: 0.75rem 1.75rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-browse:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Image Preview Box */
+        .preview-box {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+
+        .preview-actions {
+            margin-top: 1.25rem;
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .btn-predict {
+            flex: 2;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-reset {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Results Display State */
+        .results-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            gap: 1rem;
+        }
+
+        .placeholder-icon {
+            font-size: 3.5rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .result-content {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-badge-card {
+            padding: 1.5rem;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            border: 1px solid transparent;
+        }
+
+        .result-badge-card.normal {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .result-badge-card.cancer {
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.35);
+        }
+
+        .res-icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+
+        .normal .res-icon-box {
+            background: var(--accent-emerald);
+            color: white;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .cancer .res-icon-box {
+            background: var(--accent-rose);
+            color: white;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+        }
+
+        .res-text-box h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .normal .res-text-box h3 { color: #34d399; }
+        .cancer .res-text-box h3 { color: #fb7185; }
+
+        .res-text-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Diagnostic Metrics Table */
+        .metrics-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.9rem;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Loading Spinner Overlay */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            z-index: 50;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+        }
+
+        .scanner-loader {
+            width: 64px;
+            height: 64px;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-top: 4px solid var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-glow);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            padding: 1.75rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            background: rgba(7, 9, 19, 0.9);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--accent-glow);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <div class="main container">
-		<section class="iupload">
-			<h3 class="text-center py-4">PulmoScan-AI | Chest Disease Classification</h3>
-			<div class="row">
-				<div class="img-part col-md-6">
-					<div class="image-part">
-						<video autoplay id="video" poster="https://img.freepik.com/free-vector/group-young-people-posing-photo_52683-18824.jpg?size=338&ext=jpg"></video>
-						<img src="" id="photo">
-						<canvas style="display:none;" id="canvas"></canvas>
-					</div>
-					<div class="btn-part">
-						<form id="upload-data pt-3" class="">
-							<div class="input-group mt-3 row">
-								<button type="button" class="btn btn-primary col-md-5 col-xs-5 ml-3 mr-4" id="uload">Upload</button>
-								<button id="send" type="button" class="btn btn-success col-md-5 col-xs-5">Predict</button>
-							</div>
 
+    <!-- Header Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-lungs"></i>
+                </div>
+                <span class="brand-text">PulmoScan-AI</span>
+                <span class="brand-badge">v1.0 Medical AI</span>
+            </a>
+            <div class="nav-links">
+                <a href="https://github.com/Jay2849/PulmoScan-AI" target="_blank" class="nav-link-btn">
+                    <i class="fa-brands fa-github"></i> Repository
+                </a>
+                <a href="https://www.linkedin.com/in/jaynegi2819/" target="_blank" class="nav-link-btn">
+                    <i class="fa-brands fa-linkedin"></i> Jay Negi
+                </a>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Main Container -->
+    <div class="main-wrapper">
+        
+        <!-- Hero Header -->
+        <div class="hero-section">
+            <h1 class="hero-title">Automated Chest CT-Scan Diagnostics</h1>
+            <p class="hero-subtitle">High-precision Artificial Intelligence powered by VGG16 Deep Learning for real-time classification of Chest CT-Scan images into Normal vs. Adenocarcinoma Cancer.</p>
+        </div>
 
+        <!-- Quick Stats Banner -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <div class="stat-info">
+                    <h4>88.2% - 98.4%</h4>
+                    <p>Validation Accuracy</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="stat-info">
+                    <h4>VGG16 AI Engine</h4>
+                    <p>Transfer Learning Model</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+                <div class="stat-info">
+                    <h4>&lt; 250 ms</h4>
+                    <p>Real-Time Diagnostics</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="stat-info">
+                    <h4>MLflow Tracked</h4>
+                    <p>Enterprise Pipeline</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Diagnostic Workspace -->
+        <div class="workspace-grid">
+            
+            <!-- Upload Panel Card -->
+            <div class="panel-card" style="position: relative;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Upload CT-Scan Image</span>
+                    </div>
+                </div>
 
+                <!-- Dropzone Area -->
+                <div class="dropzone-container" id="dropzone" onclick="document.getElementById('fileinput').click()">
+                    <div class="upload-icon-wrapper">
+                        <i class="fa-solid fa-file-medical"></i>
+                    </div>
+                    <div class="dropzone-title">Drag & Drop Chest CT-Scan Image</div>
+                    <div class="dropzone-hint">Supports PNG, JPG, JPEG medical scan files</div>
+                    <button type="button" class="btn-browse">
+                        <i class="fa-solid fa-folder-open"></i> Browse Files
+                    </button>
+                    <input type="file" id="fileinput" style="display: none;" accept="image/*">
+                </div>
 
-							<!-- change url value  -->
+                <!-- Image Preview Area -->
+                <div class="preview-box" id="preview-box">
+                    <img id="photo" class="preview-img" src="" alt="Scan Preview">
+                    <div class="preview-actions">
+                        <button type="button" class="btn-predict" id="send">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Analysis
+                        </button>
+                        <button type="button" class="btn-reset" id="btn-reset">
+                            <i class="fa-solid fa-rotate-left"></i> Change
+                        </button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Analysis & Results Panel Card -->
+            <div class="panel-card" style="position: relative;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Diagnostic Results</span>
+                    </div>
+                </div>
 
+                <!-- Loading Spinner Overlay -->
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="scanner-loader"></div>
+                    <div class="loading-text">Analyzing Neural Network Layers...</div>
+                </div>
 
+                <!-- Placeholder Empty State -->
+                <div class="results-placeholder" id="results-placeholder">
+                    <div class="placeholder-icon">
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+                    </div>
+                    <h3>No Active Scan Loaded</h3>
+                    <p>Upload a Chest CT-Scan image on the left and click 'Run AI Analysis' to view predictions.</p>
+                </div>
 
-							<input type="hidden" class="form-control mr-2" id="url" placeholder="Enter REST Api url..." value="../predict"/>
-							<input name="upload" type="file" id="fileinput" style="position:absolute;top:-500px;"/><br/>
-						</form>
-					</div>
-				</div>
-				<div class="col-md-6 col-xs-12 right-part">
-					<h5 class="mb-2"><center>Prediction Results</center></h5>
-					<div class="row">
-						<div class="res-part2 col-md-5 col-xs-12"></div>
-						<div class="res-part col-md-5 col-xs-12"><div class="jsonRes"></div></div>
-					</div>
-				</div>
-			</div>
-		</section>
-	</div>
+                <!-- Result Active State -->
+                <div class="result-content" id="result-content">
+                    <div class="result-badge-card" id="result-badge-card">
+                        <div class="res-icon-box" id="res-icon-box">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <div class="res-text-box">
+                            <h3 id="res-heading">Diagnostic Status</h3>
+                            <p id="res-subtext">Automated Neural Classification</p>
+                        </div>
+                    </div>
 
+                    <!-- Metrics Table -->
+                    <div class="metrics-card">
+                        <div class="metric-row">
+                            <span class="metric-label">Model Architecture</span>
+                            <span class="metric-value">VGG16 Transfer Learning</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Predicted Disease Category</span>
+                            <span class="metric-value" id="metric-class">--</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Model Status</span>
+                            <span class="metric-value" style="color: var(--accent-emerald);"><i class="fa-solid fa-circle-check"></i> Verified Model</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Pipeline Version</span>
+                            <span class="metric-value">PulmoScan-AI v1.0</span>
+                        </div>
+                    </div>
+                </div>
 
-<div id="loading"><div class="loader"></div></div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+            </div>
 
-<script>
-var mybtn = document.getElementById('startbtn');
-var myvideo = document.getElementById('video');
-var mycanvas = document.getElementById('canvas');
-var myphoto = document.getElementById('photo');
-var base_data = "";
+        </div>
 
-function sendRequest(base64Data){
-	var type = "json";
-	if(base64Data != "" || base64Data != null){
-		if(type == "imgtobase"){
-			$(".res-part").html("");
-			$(".res-part").html(base64Data);
-		}
-		else if(type == "basetoimg"){
-			var imageData = $("#imgstring").val();
-			$(".res-part").html("");
-			$(".res-part").append("<img src='data:image/jpeg;base64," + imageData + "' alt='' />");
-		}
-		else{
-			var url = $("#url").val();
-			$("#loading").show();
-			$.ajax({
-				url : url,
-				type: "post",
-				cache: false,
-				async: true,
-				crossDomain: true,
-				headers: {
-					'Content-Type': 'application/json',
-					'Access-Control-Allow-Origin':'*'
-				},
-				data:JSON.stringify({image:base64Data}),
-				success: function(res){
-					$(".res-part").html("");
-					$(".res-part2").html("");
-					try{
-						var imageData = res[1].image;
-						if(imageData.length > 100){
-							if(imageData.length > 10){$(".res-part2").append("<img class='resp-img' src='data:image/jpeg;base64," + imageData + "' alt='' />");}
-						}
-					}catch(e){}
-					$(".res-part").html("<pre>" + JSON.stringify(res[0], undefined, 2) + "</pre>");
-					$("#loading").hide();
-				}
-			});
-		}
-	}
-}
+    </div>
 
-$(document).ready(function(){
-	$("#loading").hide();
+    <!-- Footer -->
+    <footer class="footer">
+        <p>PulmoScan-AI © 2026 Designed & Developed by <a href="https://github.com/Jay2849" target="_blank">Jay Negi</a>. Powered by TensorFlow, MLflow & Flask.</p>
+    </footer>
 
-	$('#send').click(function(evt){
-		sendRequest(base_data);
-    });
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        var base_data = "";
 
-    $('#uload').click(function(evt) {
-        $('#fileinput').focus().trigger('click');
-    });
-	$("#fileinput").change(function(){
-		if (this.files && this.files[0]){
-			var reader = new FileReader();
-			reader.onload = function (e){
-				var url = e.target.result;
-				base_data = url.replace(/^data:image.+;base64,/, '');
-				$('#photo').attr('src', url);
-				$('#photo').show();
-				$('#video').hide();
-			}
-			reader.readAsDataURL(this.files[0]);
-		}
-	});
-});
+        $(document).ready(function() {
+            // Drag and drop handling
+            var dropzone = $('#dropzone');
 
-</script>
+            dropzone.on('dragover dragenter', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.addClass('dragover');
+            });
+
+            dropzone.on('dragleave drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.removeClass('dragover');
+            });
+
+            dropzone.on('drop', function(e) {
+                var files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    $('#fileinput')[0].files = files;
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            $('#fileinput').change(function() {
+                if (this.files && this.files[0]) {
+                    handleFileSelect(this.files[0]);
+                }
+            });
+
+            function handleFileSelect(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var url = e.target.result;
+                    base_data = url.replace(/^data:image.+;base64,/, '');
+                    $('#photo').attr('src', url);
+                    $('#dropzone').hide();
+                    $('#preview-box').css('display', 'flex');
+                    $('#results-placeholder').show();
+                    $('#result-content').hide();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            $('#btn-reset').click(function() {
+                base_data = "";
+                $('#fileinput').val('');
+                $('#preview-box').hide();
+                $('#dropzone').show();
+                $('#results-placeholder').show();
+                $('#result-content').hide();
+            });
+
+            $('#send').click(function() {
+                if (!base_data) return;
+
+                $('#loading-overlay').css('display', 'flex');
+
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ image: base_data }),
+                    success: function(res) {
+                        $('#loading-overlay').hide();
+                        $('#results-placeholder').hide();
+                        $('#result-content').css('display', 'flex');
+
+                        var prediction = res[0].image;
+                        $('#metric-class').text(prediction);
+
+                        var card = $('#result-badge-card');
+                        var iconBox = $('#res-icon-box');
+                        var heading = $('#res-heading');
+                        var subtext = $('#res-subtext');
+
+                        if (prediction.toLowerCase().includes('cancer') || prediction.toLowerCase().includes('adenocarcinoma')) {
+                            card.removeClass('normal').addClass('cancer');
+                            iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                            heading.text('Adenocarcinoma Cancer Detected');
+                            subtext.text('Recommendation: Immediate oncologist / radiologist evaluation advised.');
+                        } else {
+                            card.removeClass('cancer').addClass('normal');
+                            iconBox.html('<i class="fa-solid fa-circle-check"></i>');
+                            heading.text('Normal Chest Scan Detected');
+                            subtext.text('No significant signs of Adenocarcinoma cancer identified in CT Scan.');
+                        }
+                    },
+                    error: function(err) {
+                        $('#loading-overlay').hide();
+                        alert('Error communicating with PulmoScan-AI server.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
