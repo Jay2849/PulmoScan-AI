@@ -10,11 +10,16 @@ from Respire.Pipeline.Training_Pipeline.Model_Trainer import ModelTrainingPipeli
 class PredictionPipeline:
     def __init__(self, filename):
         self.filename = filename
+        self.model = None
+        self.model_path = os.path.join("Artifacts", "Model_Training", "Trained_Model.h5")
+        if os.path.exists(self.model_path):
+            try:
+                self.model = load_model(self.model_path, compile=False)
+            except Exception as e:
+                print("Initial model load warning:", e)
     
     def predict(self):
-        model_path = os.path.join("Artifacts", "Model_Training", "Trained_Model.h5")
-        
-        if not os.path.exists(model_path):
+        if self.model is None or not os.path.exists(self.model_path):
             print("Model file not found. Initializing pipeline to train model...")
             try:
                 ingestion = DataIngestionTrainingPipeline()
@@ -25,15 +30,14 @@ class PredictionPipeline:
                 trainer.main()
             except Exception as e:
                 print("Model generation error:", e)
-
-        model = load_model(model_path)
+            self.model = load_model(self.model_path, compile=False)
 
         imagename = self.filename
         test_image = image.load_img(imagename, target_size=(224, 224))
         test_image = image.img_to_array(test_image)
         test_image = test_image / 255.0
         test_image = np.expand_dims(test_image, axis=0)
-        result = np.argmax(model.predict(test_image), axis=1)
+        result = np.argmax(self.model.predict(test_image), axis=1)
         print("Prediction result index:", result)
 
         if result[0] == 1:

@@ -1,4 +1,5 @@
 import os
+import traceback
 from Respire.Utils import decodeImage
 from flask_cors import CORS, cross_origin
 from flask import Flask, request, jsonify, render_template
@@ -26,10 +27,16 @@ def home():
 @app.route("/predict", methods=['POST'])
 @cross_origin()
 def predictRoute():
-    image = request.json['image']
-    decodeImage(image, clApp.filename)
-    result = clApp.classifier.predict()
-    return jsonify(result)
+    try:
+        data = request.get_json(force=True)
+        image = data.get('image', '')
+        decodeImage(image, clApp.filename)
+        result = clApp.classifier.predict()
+        return jsonify(result)
+    except Exception as e:
+        print("Prediction route exception:", str(e))
+        traceback.print_exc()
+        return jsonify([{"image": f"Prediction Error: {str(e)}"}])
 
 if __name__ == "__main__":
     clApp = ClientApp()

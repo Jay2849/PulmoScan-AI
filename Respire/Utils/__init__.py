@@ -94,10 +94,11 @@ def get_size(path: Path) -> str:
 
 def decodeImage(imgstring, fileName):
     try:
+        if "," in imgstring:
+            imgstring = imgstring.split(",")[1]
         imgdata = base64.b64decode(imgstring)
         with open(fileName, 'wb') as f:
             f.write(imgdata)
-            f.close()
 
     except Exception as e:
         raise CustomException(e)
